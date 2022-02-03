@@ -4,15 +4,15 @@ import argparse
 import shlex
 import subprocess
 
-def genDataCard(rootFile):
+def genDataCard(location, rootFile):
     dataCardText = [
         'imax 1  number of channels\n',
         'jmax 1  number of backgrounds\n',
         'kmax *  number of nuisance parameters\n',
         '-------\n',
-        f'shapes sig bin1 ~/nobackup/workarea/higgs/sixb_analysis/CMSSW_10_2_18/src/sixb/jupyter/6_background_estimation/mass_info/{rootFile}.root h_sig\n',
-        f'shapes bkg bin1 ~/nobackup/workarea/higgs/sixb_analysis/CMSSW_10_2_18/src/sixb/jupyter/6_background_estimation/mass_info/{rootFile}.root h_dat\n',
-        f'shapes data_obs bin1 ~/nobackup/workarea/higgs/sixb_analysis/CMSSW_10_2_18/src/sixb/jupyter/6_background_estimation/mass_info/{rootFile}.root h_dat\n',
+        f'shapes sig bin1 {location}/{rootFile}.root h_sig\n',
+        f'shapes bkg bin1 {location}/{rootFile}.root h_dat\n',
+        f'shapes data_obs bin1 {location}/{rootFile}.root h_dat\n',
         '_______\n',
         'bin bin1\n',
         'observation -1\n',
@@ -29,21 +29,22 @@ def genDataCard(rootFile):
     return dataCardText
 
 parser = argparse.ArgumentParser(description='Build and run data cards for HiggsCombine.')
-parser.add_argument('rootFile', 
-                    help='which ROOT file to use to build data card')
+parser.add_argument('rootFileName', 
+                    help='name of ROOT file (without .root) used to use to build data card')
+parser.add_argument('fileLocation', help='locatin of ROOT file')
 args = parser.parse_args()
 
 rootFile = args.rootFile
 
-dataCardText = genDataCard(rootFile)
+dataCardText = genDataCard(args.fileLocation, args.rootFileName)
 
 with open(f"sixb/{rootFile}.txt", "w") as f:
     f.writelines(dataCardText)
 
-subprocess.call(["text2workspace.py",f"sixb/{rootFile}.txt"])
+subprocess.call(["text2workspace.py",f"sixb/{args.rootFileName}.txt"])
 
 # I found this command_list solution for passing a command with multiple arguments and values to the command line via Python
-command_list = shlex.split('combine -M AsymptoticLimits --run blind ' + f"sixb/{rootFile}.txt")
+command_list = shlex.split('combine -M AsymptoticLimits --run blind ' + f"sixb/{args.rootFileName}.txt")
 
 output = subprocess.check_output(command_list)
 output = output.decode("utf-8").split('\n')
@@ -56,4 +57,4 @@ output = output.decode("utf-8").split('\n')
 mu = float(output[16].split(' ')[-1])
 limit = int(mu * xsec)
 
-print(f"Limit for {rootFile} is {limit} fb")
+print(f"Limit for {args.rootFileName} is {limit} fb")
