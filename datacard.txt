@@ -1,0 +1,19 @@
+imax 1  number of channels
+jmax 1  number of backgrounds
+kmax *  number of nuisance parameters
+-------
+shapes sig bin1 ~/nobackup/workarea/higgs/sixb_analysis/CMSSW_10_2_18/src/sixb/jupyter/6_background_estimation/mass_info/mX_450_mY_300_mX.root h_sig
+shapes bkg bin1 ~/nobackup/workarea/higgs/sixb_analysis/CMSSW_10_2_18/src/sixb/jupyter/6_background_estimation/mass_info/mX_450_mY_300_mX.root h_dat
+shapes data_obs bin1 ~/nobackup/workarea/higgs/sixb_analysis/CMSSW_10_2_18/src/sixb/jupyter/6_background_estimation/mass_info/mX_450_mY_300_mX.root h_dat
+_______
+bin bin1
+observation -1
+-------
+bin          bin1     bin1
+process      sig      bkg
+process      0        1 
+rate         -1       -1
+-------
+
+lumi   lnN   1.0      -
+other  lnN   -         1.
